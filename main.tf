@@ -25,7 +25,7 @@ resource "aws_instance" "webserver" {
 ### Security Group ###
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
-  
+
 }
 
 variable "sg_ports" {
