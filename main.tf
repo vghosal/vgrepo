@@ -32,8 +32,8 @@ variable "sg_ports" {
 
 resource "aws_security_group" "sg" {
 
-  name       = "dynamic_sg"
-  descriptin = "Ingress"
+  name        = "dynamic_sg"
+  description = "Ingress"
 
 
   dynamic "ingress" {
