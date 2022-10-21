@@ -79,7 +79,7 @@ jobs:
         aws-region: us-east-2
 
     - name: Update Build Agent
-       run: sudo apt -y Update
+      run: sudo apt -y Update
 
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
