@@ -1,0 +1,70 @@
+name: 'terraform-deploy'
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+env:
+  BUILD_NUMBER: "$${{ github.event.repository.name }}-{{ github.run_id }}"
+ 
+jobs:
+  validate:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+
+    # # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Validate
+      run: terraform validate -no-color
+
+    # Generates an execution plan for Terraform
+    - name: Upload artifact
+      run: actions/upload-artifact/@v3
+      with:
+        path: |
+        **/*.tf
+  publish:
+    name: Publish Artifacts
+    environment: dev
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: run the install program
+        run: sudo apt -y install awscli
+      - name: confirm the installation
+        run: ls 
+      - name: set region
+        run: aws configure set region us-east-1
+      - name: publish artifacts 
+        run: cd artifact 
+      - name: tag repository
+        runs: echo &BUILD_NUMBER 
