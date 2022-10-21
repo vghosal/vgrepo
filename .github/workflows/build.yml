@@ -1,3 +1,29 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@vghosal 
+vghosal
+/
+vgrepo
+Public
+Code
+Pull requests
+Actions
+Security
+Insights
+Settings
+vgrepo/.github/workflows/terraformPlan.yml
+@vghosal
+vghosal test format
+Latest commit e745e98 2 days ago
+ History
+ 1 contributor
+108 lines (91 sloc)  3.98 KB
+
 # This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
 # with an API token for Terraform Cloud (app.terraform.io). On pull request events, this workflow will run
 # `terraform init`, `terraform fmt`, and `terraform plan` (speculative plan via Terraform Cloud). On push events
@@ -42,7 +68,7 @@
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-name: 'terraform-build'
+name: 'Terraform-build'
 
 on:
   push:
@@ -59,8 +85,10 @@ permissions:
 
 jobs:
   terraform:
-    name: 'Validate terraform configuration files'
+    name: 'Terraform'
     runs-on: ubuntu-latest
+    environment: production
+   
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -76,6 +104,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
 
+
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v3
@@ -90,10 +119,13 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
+    # # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt -check
 
     # Generates an execution plan for Terraform
-    - name: Terraform validate
-      run: terraform validate
+    - name: Terraform Plan
+      run: terraform plan -input=false
 
       # On push to "main", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
